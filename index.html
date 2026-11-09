@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FGO Catalogue</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f1115">
+<link rel="icon" id="fav" href="icons/icon-192.png?v=2">
+<link rel="apple-touch-icon" href="icons/icon-192.png?v=2">
+<style>
+:root{--bg:#0f1115;--pn:#171a21;--ln:#262b36;--tx:#e6e8ee;--mu:#7d8494;--ac:#d9b25f;--ok:#5fc79a;--bad:#e07a7a}
+:root[data-theme=light]{--bg:#f5f4f0;--pn:#fff;--ln:#e0ddd3;--tx:#1f2229;--mu:#6f7482;--ac:#9a6b12;--ok:#1f8a5c;--bad:#b84a4a}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.45 system-ui,-apple-system,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--ln);padding:10px 16px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.bar+.bar{margin-top:8px}
+h1{font-size:15px;font-weight:600;letter-spacing:.04em;margin:0 10px 0 0;color:var(--ac)}
+nav a{color:var(--mu);text-decoration:none;padding:5px 11px;border-radius:6px}
+nav a.on{color:var(--tx);background:var(--pn)}
+input,select,button,textarea{background:var(--pn);color:var(--tx);border:1px solid var(--ln);border-radius:6px;padding:6px 9px;font:inherit;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--ac)}
+button{cursor:pointer}button:hover{border-color:var(--ac)}
+.chip{border-radius:99px;padding:3px 11px;font-size:12px;color:var(--mu)}
+.chip.on{color:var(--ok);border-color:var(--ok)}.chip.no{color:var(--bad);border-color:var(--bad);text-decoration:line-through}
+.sp{margin-left:auto}.mu{color:var(--mu)}.sm{font-size:12px}
+.a{border-color:var(--ac)!important;color:var(--ac)}
+#stats{padding:10px 16px;color:var(--mu);font-size:12px}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;padding:0 16px 24px}
+.card{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:8px;cursor:pointer;position:relative}
+.card:hover{border-color:var(--ac)}.card.off{opacity:.4}
+.card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block}
+.card .n{font-size:12px;margin-top:6px;height:2.4em;line-height:1.2;overflow:hidden}
+.card .m{font-size:11px;color:var(--mu)}
+.gold{position:absolute;top:10px;right:10px;width:9px;height:9px;border-radius:50%;background:var(--ac)}
+.pin{position:absolute;top:8px;left:9px;font-size:12px}
+.qk{display:flex;gap:3px;margin-top:6px}.qk button{flex:1;padding:2px 0;font-size:11px;border-radius:4px}
+#grid.rows{display:block;overflow-x:auto}
+.r{display:grid;grid-template-columns:44px minmax(150px,2fr) 70px 60px 50px 90px 90px 110px 50px;gap:10px;align-items:center;padding:5px 10px;border-bottom:1px solid var(--ln);min-width:860px;cursor:pointer}
+.r:hover{background:var(--pn)}.r.off{opacity:.4}
+.r.h{color:var(--mu);font-size:11px;text-transform:uppercase;cursor:default}.r.h:hover{background:none}
+.r img{width:38px;height:38px;border-radius:6px}
+#home{padding:16px;max-width:1100px;margin:auto}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;margin-top:12px}
+.pn{background:var(--pn);border:1px solid var(--ln);border-radius:10px;padding:14px}
+.pn h3{margin:0 0 10px;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);font-weight:600}
+.big{font-size:30px;font-weight:600;color:var(--ac)}
+.bl{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:12px}.bl span:first-child{width:92px;color:var(--mu)}.bl span:last-child{width:52px;text-align:right}
+.bl div{flex:1;height:6px;background:var(--ln);border-radius:3px}.bl i{display:block;height:100%;background:var(--ac);border-radius:3px}
+.mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
+.ban{background:var(--pn);border:1px solid var(--ac);border-radius:10px;padding:10px 14px;margin-bottom:12px;display:flex;gap:10px;align-items:center}
+#modal{position:fixed;inset:0;background:#000b;display:none;align-items:center;justify-content:center;padding:12px;z-index:10}
+#modal.on{display:flex}
+#box{background:var(--bg);border:1px solid var(--ln);border-radius:12px;max-width:660px;width:100%;max-height:92vh;overflow:auto;padding:18px}
+.top{display:flex;gap:14px;align-items:center}.top img{width:76px;height:76px;border-radius:8px}.top h2{margin:0;font-size:18px}
+.sec{margin-top:16px;padding-top:12px;border-top:1px solid var(--ln)}
+.sec>b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu)}
+.fs{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px;margin-top:8px}
+.f span{display:block;font-size:11px;color:var(--mu)}.f input{width:100%}
+.sk{display:flex;gap:10px;margin-top:10px}.sk img{width:40px;height:40px;flex:none}
+.sk b{display:block;font-size:13px}.sk small{color:var(--mu)}
+textarea{width:100%;min-height:56px;margin-top:8px}
+.dots{display:flex;gap:3px;margin-top:3px}.dot{width:14px;height:5px;border-radius:3px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:8px}
+.th{position:relative;text-align:center}.th img{width:100%;aspect-ratio:3/4;object-fit:contain;background:var(--pn);border-radius:8px;display:block}
+.th.lk img{filter:grayscale(1) brightness(.35)}.lock{position:absolute;top:38%;left:0;right:0;font-style:normal;font-size:22px}
+.th small{display:block;color:var(--mu);font-size:11px;margin-top:3px}#fx{margin-top:8px}
+details{margin:6px 0}summary{cursor:pointer;padding:3px 0}.nm{display:inline-block;margin:3px 6px 3px 0;padding:2px 9px;border:1px solid var(--ln);border-radius:99px;font-size:12px;cursor:pointer}.nm:hover{border-color:var(--ac)}
+.hero{display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:12px;background:linear-gradient(135deg,var(--pn),var(--bg))}
+.rg{position:relative;width:132px;height:132px}.rgt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}.rgt b{font-size:26px;color:var(--ac)}.rgt span{font-size:11px;color:var(--mu)}
+.hx{flex:1;min-width:260px}.hx h2{margin:2px 0 14px;font-size:22px;font-weight:600}
+.stats{display:flex;gap:24px;flex-wrap:wrap;margin-bottom:14px}.stats b{display:block;font-size:20px}.stats span{font-size:11px;color:var(--mu)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
+.tile{display:flex;align-items:center;gap:14px;cursor:pointer}.tile:hover,.tl:hover{border-color:var(--ac)}.tile b{display:block;font-size:22px}.tile span{font-size:12px;color:var(--mu)}
+.ct{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.tl{border:1px solid var(--ln);border-radius:8px;padding:8px 10px;cursor:pointer;font-size:12px}.tl b{display:block;font-size:16px;margin-top:2px}.tl small{color:var(--mu);font-weight:400}
+.bl2,.pb{height:4px;background:var(--ln);border-radius:2px;margin-top:6px}.bl2 i,.pb i{display:block;height:100%;background:var(--ac);border-radius:2px}
+.card.l100,.card.l120{border-width:2px;padding:7px}.card.l100{border-color:#a9b2c0}.card.l100:hover{border-color:#d5dbe5}
+.card.l120{border-color:#f0c040;box-shadow:0 0 10px #f0c04044}.card.l120:hover{border-color:#ffd966}
+.r.l100{box-shadow:inset 3px 0 #a9b2c0}.r.l120{box-shadow:inset 3px 0 #f0c040}
+.gg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));column-gap:28px}.stats>div[data-goal]{cursor:pointer}details p{margin:4px 0 8px;font-size:13px}
+.addbar{position:sticky;top:-18px;z-index:3;background:var(--bg);padding:10px 0;margin-top:12px;border-bottom:1px solid var(--ln);align-items:center}
+.qr{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}.ql{width:54px;font-size:11px;color:var(--mu);text-transform:uppercase}.qr button{padding:4px 10px;font-size:12px}
+.card.art img{aspect-ratio:3/4;object-position:top}.card.pk{border-color:var(--ac);box-shadow:0 0 0 1px var(--ac)}.pkb{position:absolute;top:30px;left:10px;z-index:2;background:var(--ac);color:#111;border-radius:99px;font:600 11px system-ui;font-style:normal;padding:1px 8px}
+.xd{margin-top:6px}.lvl{font-size:12px}.lvl small{color:var(--mu)}
+.lb{height:3px;background:var(--ln);border-radius:2px;margin:3px 0 6px}.lb i{display:block;height:100%;background:var(--ac);border-radius:2px}.lb.l100 i{background:#a9b2c0}.lb.l120 i{background:#f0c040}
+.sk3{font-size:13px;font-weight:600}.sk3 em{color:var(--mu);font-style:normal;margin:0 3px}.sk3 .g,.mm .g{color:var(--ac)}
+.mm{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:3px}
+#grid.compact{grid-template-columns:repeat(auto-fill,minmax(92px,1fr))}.compact .card{padding:5px}.compact .xd,.compact .card .m,.compact .dots{display:none}.compact .card .n{font-size:11px}
+.gh{grid-column:1/-1;display:flex;gap:8px;align-items:center;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);padding:12px 2px 2px;border-bottom:1px solid var(--ln)}.gh span{color:var(--ac)}.rows .gh{padding-left:10px}
+header{padding:8px 14px}.bar+.bar{margin-top:6px}#act .nm{border-color:var(--ac)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--pn);border:1px solid var(--ac);padding:8px 16px;border-radius:8px;z-index:20;display:none}
+#sy[data-s=ok]{color:var(--ok)}#sy[data-s=busy],#sy[data-s=pend]{color:var(--ac)}#sy[data-s=err]{color:var(--bad)}#sy[data-s=off]{color:var(--mu)}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>FGO CATALOGUE</h1>
+    <nav><a href="#home" data-p="home">Home</a><a href="#collection" data-p="collection">My Collection</a><a href="#database" data-p="database">Database</a></nav>
+    <span class="sp"></span>
+    <span id="vw"><button id="qe" title="Show quick-edit buttons on cards">✎ Edit</button><button id="dn" title="Compact cards">▫ Compact</button><button id="gp" title="Group by class">≡ Group</button><button id="vg" title="Grid (G)">▦</button><button id="vr" title="Rows (G)">☰</button></span>
+    <button id="sy" data-s="off" title="Cloud sync">☁</button>
+    <button id="th" title="Theme">◐</button>
+    <select id="reg"><option>NA</option><option>JP</option></select>
+  </div>
+  <div id="fb">
+    <div class="bar">
+      <input id="q" type="search" placeholder="Search name…  ( / )">
+      <select id="cls"></select>
+      <select id="rar"><option value="">Rarity</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option><option>0</option></select>
+      <select id="own"><option value="">All</option><option value="y">Owned</option><option value="n">Not owned</option></select>
+      <select id="sort"><option value="no">Sort: No.</option><option value="name">Name</option><option value="lvl">Level</option><option value="bond">Bond</option><option value="rar">Rarity</option><option value="t">Recently edited</option></select><button id="mf">Filters ▾</button>
+    </div>
+    <div id="more" hidden>
+    <div class="bar" id="chips">
+      <button class="chip" data-f="max">Fully maxed</button><button class="chip" data-f="lv">Level cap</button><button class="chip" data-f="l100">Lv 100+</button><button class="chip" data-f="l120">Lv 120</button>
+      <button class="chip" data-f="sk">Skills 10</button>
+      <button class="chip" data-f="fou1">Fou 1000</button><button class="chip" data-f="fou">Fou 2000</button>
+      <button class="chip" data-f="np">NP 5</button><button class="chip" data-f="bond10">Bond 10</button><button class="chip" data-f="bond">Bond 15</button>
+      <span class="mu sm">Lv ≥</span><input id="lvm" type="number" min="0" max="120" style="width:62px">
+      <span class="sp"></span>
+      <select id="pre"></select><button id="ps">Save preset</button><button id="pd">Delete</button>
+    </div>
+    <div class="bar" id="fx"></div>
+    </div>
+    <div class="bar" id="pk" hidden><span class="mu sm">Pick list:</span><button id="pm">Pick mode: off</button><button id="po">List (0)</button><button id="ps2">▶ Start</button></div>
+    <div id="pp" class="pn" hidden style="margin-top:8px"><textarea id="pt" placeholder="Type names, one per line or separated by commas (Gareth, Melusine…)"></textarea><div class="bar" style="margin-top:6px"><button id="pa">Add names</button><button id="psn">Sort by No.</button><button id="pc">Clear</button></div><div id="pl" style="margin-top:8px"></div></div>
+  </div>
+</header>
+<div id="home" hidden></div>
+<div id="lib" hidden><div id="stats"></div><div id="act" style="padding:0 16px 8px"></div><div id="grid"></div></div>
+<div id="modal"><div id="box"></div></div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const API='https://api.atlasacademy.io',DAY=864e5;
+let region=LS.get('fgo_region','NA'),view=LS.get('fgo_view','grid'),theme=LS.get('fgo_theme','dark');
+let mine=LS.get('fgo_owned',{}),meta=Object.assign({pins:[],presets:[],lastExport:0,del:{},mt:0},LS.get('fgo_meta',{}));
+let list=[],cache={},fs={},navL=[],fh=null,wt;
+const blank=()=>({lvl:1,asc:0,np:1,sk:[1,1,1],ap:[0,0,0,0,0],hp:0,atk:0,bond:0,grail:0,note:'',t:Date.now()});
+const norm=m=>Object.assign(blank(),m,{sk:(m.sk||[1,1,1]).slice(0,3),ap:m.ap||[0,0,0,0,0]});
+Object.keys(mine).forEach(k=>mine[k]=norm(mine[k]));
+const PG=()=>location.hash.slice(1)||'home';
+const clean=t=>(t||'').replace(/\[[^\]]*\]/g,'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const stars=s=>'★'.repeat(s.rar)||'—';
+const BASE={5:90,4:80,3:70,2:65,1:60,0:40};
+const maxLv=s=>BASE[s.rar]||40;
+const CN={moonCancer:'Moon Cancer',alterEgo:'Alter Ego',cccAlterEgo:'Alter Ego (CCC)',unBeastOlgaMarie:'Beast (Olga Marie)',beastEresh:'Beast (Ereshkigal)'};
+const cn=c=>CN[c]||c.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,x=>x.toUpperCase());
+const P={asc:m=>m.asc>=4,sk:m=>m.sk.every(x=>x>=10),fou:m=>m.hp>=2000&&m.atk>=2000,ap:m=>m.ap.every(x=>x>=10),np:m=>m.np>=5,bond:m=>m.bond>=15,
+  max:m=>P.sk(m)&&P.fou(m),lv:(m,s)=>m.lvl>=maxLv(s,m)};
+const sv=no=>list.find(s=>s.no==no);
+P.fou1=m=>m.hp>=1000&&m.atk>=1000;P.l100=m=>m.lvl>=100;P.l120=m=>m.lvl>=120;P.bond10=m=>m.bond>=10;
+const GOALS=[['Fully maxed','max'],['Skills 10/10/10','sk'],['Fou 1000','fou1'],['Fou 2000','fou'],['Bond 10','bond10'],['Bond 15','bond'],['NP 5','np'],['Level cap','lv'],['Level 100+','l100'],['Level 120','l120']];
+const FM={max:m=>`${m.sk.join('/')} · +${m.hp}/${m.atk}`,sk:m=>m.sk.join('/'),fou:m=>`+${m.hp}/${m.atk}`,ap:m=>m.ap.join('/'),np:m=>'NP'+m.np,bond:m=>'♥'+m.bond,lv:(m,s)=>`Lv${m.lvl}/${maxLv(s)}`,fou1:m=>`+${m.hp}/${m.atk}`,bond10:m=>'♥'+m.bond,l100:m=>'Lv'+m.lvl,l120:m=>'Lv'+m.lvl};
+const todoOf=(own,k)=>own.filter(s=>!P[k](mine[s.no],s));
+const leftHtml=own=>GOALS.map(([l,k])=>{const t=todoOf(own,k);return `<details><summary>${l}: <b>${t.length}</b> left</summary><div>${t.map(s=>{const f=FM[k](mine[s.no],s);return `<span class="nm" data-no="${s.no}">${s.name}${f?` <span class="mu">${f}</span>`:''}</span>`}).join('')||'<span class="mu sm">All done 🎉</span>'}</div></details>`}).join('');
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',2200)}
+
+// ---------- saving ----------
+const bundle=()=>JSON.stringify({mine,meta},null,2);
+async function writeFile(){if(!fh)return;try{const w=await fh.createWritable();await w.write(bundle());await w.close()}catch{fh=null;toast('Linked file lost, relink it')}}
+function save(){const pp=JSON.stringify([meta.pins,meta.presets]);if(pp!==lastPP){lastPP=pp;meta.mt=Date.now()}LS.set('fgo_owned',mine);LS.set('fgo_meta',meta);clearTimeout(wt);wt=setTimeout(writeFile,600);syQueue(2500)}
+function exportJ(){meta.lastExport=Date.now();save();const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bundle()],{type:'application/json'}));a.download='fgo-collection.json';a.click();render()}
+function importJ(){const i=document.createElement('input');i.type='file';i.accept='.json';i.onchange=async()=>{try{const o=JSON.parse(await i.files[0].text()),nm=o.mine||o,now=Date.now(),old=mine,keep=meta.del||{};
+  const nt=e=>{const c=Object.assign({},e);delete c.t;return stable(c)};
+  Object.keys(old).forEach(k=>{if(!nm[k])keep[k]=now});
+  const next={};Object.keys(nm).forEach(k=>{const e=norm(nm[k]);if(old[k]&&nt(old[k])==nt(e))e.t=old[k].t;else e.t=now;next[k]=e});
+  Object.keys(mine).forEach(k=>delete mine[k]);Object.assign(mine,next);
+  if(o.meta)Object.assign(meta,o.meta);meta.del=Object.assign({},(o.meta&&o.meta.del)||{},keep);meta.pins=(meta.pins||[]).filter(x=>mine[x]);
+  save();render();toast('Imported')}catch{alert('Invalid file')}};i.click()}
+async function linkFile(){if(!window.showSaveFilePicker)return alert(navigator.brave?'Brave turns file saving off by default.\n\n1. Open brave://flags/#file-system-access-api\n2. Set it to Enabled\n3. Relaunch Brave and try again.\n\nUntil then, use Export to back up.':'Your browser does not support auto-save to a file (Chrome, Edge or Brave with the file-system flag on). Use Export to back up.');try{fh=await showSaveFilePicker({suggestedName:'fgo-collection.json',types:[{accept:{'application/json':['.json']}}]});await writeFile();toast('Auto-saving to file this session');render()}catch{}}
+
+// ---------- cloud sync (private GitHub repo) ----------
+const SYK='fgo_sync';
+let SY=LS.get(SYK,null),sySt={k:'off',msg:'Not connected'},syTm=null,syBusy=false,syAgain=false,syT0=0,lastPP=JSON.stringify([meta.pins,meta.presets]);
+meta.del=meta.del||{};meta.mt=meta.mt||0;
+const syOn=()=>!!(SY&&SY.token&&SY.owner&&SY.repo);
+const b64e=s=>{const b=new TextEncoder().encode(s);let r='';for(let i=0;i<b.length;i+=0x8000)r+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(r)};
+const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,'')),c=>c.charCodeAt(0)));
+const stable=o=>JSON.stringify(o,(k,v)=>v&&typeof v=='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}):v);
+const syMeta=()=>({pins:meta.pins,presets:meta.presets,del:meta.del,mt:meta.mt});
+const syBundle=()=>JSON.stringify({mine,meta:syMeta()},null,2);
+const syUrl=()=>`https://api.github.com/repos/${SY.owner}/${SY.repo}/contents/${(SY.path||'fgo-collection.json').split('/').map(encodeURIComponent).join('/')}`;
+const syH=()=>({Authorization:'Bearer '+SY.token,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'});
+function setSy(k,msg){sySt={k,msg};syUI()}
+function syUI(){
+  const b=$('#sy');if(b){b.dataset.s=sySt.k;b.title='Cloud sync: '+sySt.msg}
+  const s=$('#sys');if(s)s.textContent=sySt.msg;
+}
+const syTime=()=>new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+function syErr(r){
+  if(r.status==401)return 'Token is invalid or expired. Create a new one and reconnect.';
+  if(r.status==403)return 'Token has no write access. It needs "Contents: Read and write" on the data repo.';
+  if(r.status==404)return 'Repository not found, or the token has no access to it.';
+  return 'GitHub error '+r.status;
+}
+// Merge remote data into local, per servant: newest edit wins, deletions are remembered.
+function mergeRemote(rm,rmeta){
+  const before=stable({mine,meta:syMeta()}),now=Date.now();
+  const del=Object.assign({},rmeta.del||{}),ld=meta.del||{};
+  for(const k in ld)del[k]=Math.max(del[k]||0,ld[k]);
+  const out={};
+  new Set([...Object.keys(mine),...Object.keys(rm)]).forEach(k=>{
+    const a=mine[k],b=rm[k];
+    const win=!a?b:!b?a:((a.t||0)>=(b.t||0)?a:b);
+    if(del[k]&&del[k]>=(win.t||0))return;
+    if(a&&win===b)Object.assign(a,norm(b));
+    out[k]=a||norm(b);
+  });
+  Object.keys(mine).forEach(k=>{if(!(k in out))delete mine[k]});
+  Object.assign(mine,out);
+  for(const k in del)if(now-del[k]>90*DAY)delete del[k];
+  meta.del=del;
+  if((rmeta.mt||0)>(meta.mt||0)||(!meta.mt&&!meta.pins.length&&!meta.presets.length)){meta.pins=rmeta.pins||[];meta.presets=rmeta.presets||[];meta.mt=rmeta.mt||0}
+  meta.pins=meta.pins.filter(x=>mine[x]);
+  lastPP=JSON.stringify([meta.pins,meta.presets]);
+  LS.set('fgo_owned',mine);LS.set('fgo_meta',meta);
+  return stable({mine,meta:syMeta()})!==before;
+}
+async function syncNow(){
+  if(!syOn())return;
+  if(syBusy){syAgain=true;return}
+  clearTimeout(syTm);syBusy=true;setSy('busy','Syncing…');let changed=false;
+  try{
+    for(let n=0;n<4;n++){
+      const r=await fetch(syUrl()+(SY.branch?'?ref='+encodeURIComponent(SY.branch):''),{headers:syH(),cache:'no-store'});
+      let sha=null,remote=null;
+      if(r.ok){
+        const j=await r.json();sha=j.sha;
+        if(!j.content&&j.size)throw new Error('Data file is too large for sync.');
+        remote=JSON.parse(j.content?b64d(j.content):'{}');
+      }else if(r.status!=404)throw new Error(syErr(r));
+      if(remote){
+        const rm=remote.mine||(remote.meta?{}:remote);
+        if(mergeRemote(rm,remote.meta||{}))changed=true;
+        if(stable({mine:remote.mine||{},meta:remote.meta||{}})===stable({mine,meta:syMeta()}))break;
+      }
+      const body={message:'sync '+new Date().toISOString(),content:b64e(syBundle())};
+      if(sha)body.sha=sha;if(SY.branch)body.branch=SY.branch;
+      const w=await fetch(syUrl(),{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},syH()),body:JSON.stringify(body)});
+      if(w.ok)break;
+      if((w.status==409||w.status==422)&&n<3)continue;
+      throw new Error(syErr(w));
+    }
+    syT0=Date.now();setSy('ok','Synced at '+syTime());
+  }catch(e){
+    if(e instanceof TypeError)setSy('pend','Offline. Changes will sync when you are back online.');
+    else setSy('err',String(e.message||e));
+  }finally{
+    syBusy=false;
+    if(changed)render();
+    if(syAgain){syAgain=false;syQueue(500)}
+  }
+}
+function syQueue(ms){
+  if(!syOn())return;
+  if(!syBusy)setSy('pend',navigator.onLine?'Unsynced changes…':'Offline. Changes will sync when you are back online.');
+  clearTimeout(syTm);syTm=setTimeout(syncNow,ms);
+}
+async function syConnect(){
+  let r=($('#syr').value||'').trim().replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'');
+  const t=($('#syt').value||'').trim(),p=r.split('/');
+  if(p.length!=2||!p[0]||!p[1]||!t)return alert('Fill in the repository as owner/name and paste the token.');
+  const cand={owner:p[0],repo:p[1],token:t,path:'fgo-collection.json'};
+  try{
+    const res=await fetch(`https://api.github.com/repos/${cand.owner}/${cand.repo}`,{headers:{Authorization:'Bearer '+t,Accept:'application/vnd.github+json'},cache:'no-store'});
+    if(!res.ok)return alert(res.status==401?'The token was rejected. Check that you copied it fully.':'Cannot open that repository with this token. Check the name, and that the token has access to it.');
+    const j=await res.json();
+    if(!j.private)return alert('That repository is PUBLIC, so anyone could read your collection. Make it private (Settings → Danger Zone → Change visibility) and try again.');
+    if(j.permissions&&j.permissions.push===false)return alert('The token can only read. It needs "Contents: Read and write".');
+  }catch{return alert('Could not reach GitHub. Check your connection.')}
+  SY=cand;LS.set(SYK,SY);toast('Connected');render();syncNow();
+}
+function syOff(){
+  if(!confirm('Disconnect cloud sync on this device? Your local data stays. The token is removed from this browser.'))return;
+  SY=null;try{localStorage.removeItem(SYK)}catch{}clearTimeout(syTm);setSy('off','Not connected');render();
+}
+function syPanel(){
+  if(syOn())return `<div class="pn" id="syp" style="margin-top:12px"><h3>Cloud sync</h3><p class="sm" id="sys"></p><p class="mu sm">Connected to <b>${SY.owner}/${SY.repo}</b>. Changes are saved automatically a few seconds after you edit, and fetched when you open the app.</p><div class="bar"><button id="sn">Sync now</button><button id="sx">Disconnect this device</button></div></div>`;
+  return `<div class="pn" id="syp" style="margin-top:12px"><h3>Cloud sync</h3><p class="mu sm">Keep your collection in a <b>private</b> GitHub repository and use it on all your devices. Only someone with your token can read or change it.</p>
+  <div class="f"><span>Data repository (owner/name)</span><input id="syr" placeholder="yourname/fgo-data" autocomplete="off"></div>
+  <div class="f" style="margin-top:8px"><span>Access token</span><input id="syt" type="password" placeholder="github_pat_…" autocomplete="off"></div>
+  <div class="bar" style="margin-top:10px"><button id="sc">Connect</button></div>
+  <details><summary>How do I get a token?</summary><p class="mu">1. On GitHub, create a <b>private</b> repository (for example <b>fgo-data</b>).<br>2. Go to Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → Generate new token.<br>3. Repository access: <b>Only select repositories</b>, then choose the data repo.<br>4. Repository permissions: <b>Contents → Read and write</b>.<br>5. Generate, copy the token, and paste it above. Do this once on each device.</p></details></div>`;
+}
+window.addEventListener('online',()=>{if(syOn())syncNow()});
+document.addEventListener('visibilitychange',()=>{
+  if(!syOn())return;
+  if(document.hidden){if(syTm)syncNow()}
+  else if(Date.now()-syT0>20000)syncNow();
+});
+setTimeout(()=>{if(syOn())syncNow()},400);
+
+// ---------- data ----------
+function showErr(e){const h=`<div style="padding:16px;max-width:560px"><p><b>Could not load the servant list.</b></p><p class="mu sm">${String(e&&e.message||e||'Unknown error').replace(/</g,'&lt;')}</p><p class="mu sm">Check your internet connection. If you opened this file directly from your computer, try the hosted or localhost version. You can also open <a href="https://api.atlasacademy.io/export/NA/basic_servant.json" target="_blank" style="color:var(--ac)">this link</a> to see if Atlas Academy is reachable.</p><button id="retry">Retry</button></div>`;$('#home').innerHTML=h;$('#grid').innerHTML=h;$('#stats').textContent=''}
+async function load(){
+  $('#home').innerHTML=$('#grid').innerHTML='<p class="mu" style="padding:16px">Loading servants…</p>';
+  $('#reg').value=region;try{localStorage.removeItem('fgo_list_'+region)}catch{}const key='fgo_list2_'+region;let d=LS.get(key,null);
+  if(!d||!d.length){
+    const urls=region=='NA'?[`${API}/export/NA/basic_servant.json`,`${API}/export/NA/basic_servant_lang_en.json`]:[`${API}/export/JP/basic_servant_lang_en.json`,`${API}/export/JP/basic_servant.json`];
+    let j=null,err;
+    for(const u of urls){try{const r=await fetch(u);if(!r.ok)throw new Error('HTTP '+r.status);j=await r.json();if(Array.isArray(j)&&j.length)break;j=null}catch(e){err=e}}
+    if(!j)return showErr(err);
+    d=j.map(s=>({no:s.collectionNo,name:s.name,cls:s.className,rar:s.rarity,face:s.face,ty:s.type})).filter(s=>s.no>0&&(!s.ty||s.ty=='normal'||s.ty=='heroine')).sort((a,b)=>a.no-b.no);
+    if(!d.length)return showErr(new Error('The list came back empty'));
+    LS.set(key,d)}
+  list=d.map(s=>({...s,cls:cn(s.cls)}));artC=LS.get('fgo_art_'+region,{});idx=Object.fromEntries(Object.entries(LS.get('fgo_idx_'+region,{})||{}).filter(([k,v])=>v&&v.b));$('#cls').innerHTML='<option value="">Class</option>'+[...new Set(list.map(s=>s.cls))].sort().map(c=>`<option>${c}</option>`).join('');
+  route();
+}
+
+// ---------- filter state / presets ----------
+const getState=()=>({q:$('#q').value,cls:$('#cls').value,rar:$('#rar').value,sort:$('#sort').value,lvm:$('#lvm').value,own:$('#own').value,fs:{...fs},fe:{...fe}});
+function applyState(s){const sel=(i,v)=>{const e=$(i);e.value=v||'';if(e.selectedIndex<0)e.selectedIndex=0};$('#q').value=s.q||'';sel('#cls',s.cls);sel('#rar',s.rar);sel('#sort',s.sort||'no');sel('#own',s.own);$('#lvm').value=s.lvm||'';fs={...(s.fs||{})};fe={...(s.fe||{})};paint()}
+const paint=()=>{$$('[data-f]').forEach(b=>b.className='chip '+['','on','no'][fs[b.dataset.f]||0]);$$('[data-x]').forEach(b=>b.className='chip '+(fe[b.dataset.x]?'on':''))};
+let states=LS.get('fgo_states',null)||{collection:LS.get('fgo_last',{})},curPage=null;
+function goColl(patch){states.collection={q:'',cls:'',rar:'',own:'',sort:'no',lvm:'',fs:{},fe:{},...patch};LS.set('fgo_states',states);curPage=null;location.hash='collection'}
+const BI=[['Needs skills',{fs:{sk:2}}],['5★ not maxed',{rar:'5',fs:{max:2}}],['Bond under 15',{fs:{bond:2}}],['Fully maxed',{fs:{max:1}}],['Below level cap',{fs:{lv:2}}]];
+function presets(){$('#pre').innerHTML='<option value="">Presets…</option>'+BI.map((p,i)=>`<option value="b${i}">${p[0]}</option>`).join('')+meta.presets.map((p,i)=>`<option value="u${i}">★ ${p.n}</option>`).join('')}
+
+// ---------- routing ----------
+function route(){
+  const p=PG();
+  if((p=='collection'||p=='database')&&p!=curPage){if(curPage)states[curPage]=getState();applyState(states[p]||{});curPage=p;LS.set('fgo_states',states)}$$('nav a').forEach(a=>a.classList.toggle('on',a.dataset.p==p));
+  $('#home').hidden=p!='home';$('#lib').hidden=p=='home';$('#fb').hidden=p=='home';$('#vw').hidden=p=='home';
+  $('#chips').hidden=p!='collection';$('#own').hidden=p!='database';$('#pk').hidden=p!='database';if(p!='database')$('#pp').hidden=true;pkui();if(p=='collection')loadArt();
+  $('#vg').classList.toggle('a',view=='grid');$('#vr').classList.toggle('a',view=='rows');presets();render();bp();uiPaint();$('#qe').hidden=p!='collection';
+}
+const render=()=>{if(!list.length)return;PG()=='home'?home():lib()};
+
+// ---------- library ----------
+const fouC=m=>m.hp>=2000&&m.atk>=2000?'g':'';
+function card(s,m,coll){
+  const lc=m?(m.lvl>=120?'l120':m.lvl>=100?'l100':''):'off',pk=PG()=='database'&&picks.includes(s.no),img=(coll&&artC[s.no]?.f)||s.face;
+  let x='';
+  if(m&&coll){x=`<div class="xd"><div class="lvl">Lv${m.lvl}<small>/${maxLv(s,m)}</small></div><div class="lb ${lc}"><i style="width:${Math.min(100,m.lvl/120*100)}%"></i></div>
+    <div class="sk3">${m.sk.map(v=>`<b class="${v>=10?'g':''}">${v}</b>`).join('<em>·</em>')}</div>
+    <div class="mm"><span>♥${m.bond}</span><span class="${fouC(m)}">+${m.hp}/${m.atk}</span></div>
+    ${qedit?`<div class="qk">${[0,1,2].map(i=>`<button data-q="sk${i}" data-no="${s.no}" title="Skill ${i+1}">${m.sk[i]}</button>`).join('')}<button data-q="bond" data-no="${s.no}" title="Bond">♥${m.bond}</button></div>`:''}</div>`}
+  else if(m)x=`<div class="xd"><div class="m">Lv${m.lvl}/${maxLv(s,m)}</div></div>`;
+  return `<div class="card ${lc}${pk?' pk':''}" data-no="${s.no}">${m&&P.max(m)?'<i class="gold" title="Fully maxed"></i>':''}${meta.pins.includes(s.no)?'<i class="pin">📌</i>':''}${pk?`<i class="pkb">${picks.indexOf(s.no)+1}</i>`:''}
+  <img loading="lazy" src="${img}" alt=""><div class="n">${s.name}</div><div class="m">${s.cls} · ${stars(s)}</div>${x}${dots(s.no)}</div>`}
+function lib(){
+  const coll=PG()=='collection',q=$('#q').value.toLowerCase(),c=$('#cls').value,r=$('#rar').value,o=$('#own').value,lvm=+$('#lvm').value||0,so=$('#sort').value;
+  const anyF=Object.values(fs).some(Boolean)||lvm;states[PG()]=getState();LS.set('fgo_states',states);
+  const fk=Object.keys(fe),fxE=fk.filter(k=>k[0]=='e').map(k=>k.slice(2)),fxC=fk.filter(k=>k[0]=='c').map(k=>k.slice(2)),fxT=fk.filter(k=>k[0]=='t').map(k=>k.slice(2));let miss=0;
+  let rows=list.filter(s=>{const m=mine[s.no];
+    if(coll&&!m)return false;if(!coll&&((o=='y'&&!m)||(o=='n'&&m)))return false;
+    if(q&&!s.name.toLowerCase().includes(q))return false;if(c&&s.cls!==c)return false;if(r!==''&&String(s.rar)!==r)return false;
+    if(coll&&anyF){if(lvm&&m.lvl<lvm)return false;for(const k in fs){if(fs[k]==1&&!P[k](m,s))return false;if(fs[k]==2&&P[k](m,s))return false}}
+    if(fk.length){const ix=idx[s.no];if(!ix){miss++;return false}if(fxE.some(k=>!has(ix,k)))return false;if((fxC.length||fxT.length)&&!ix.np.some(([c,t])=>(!fxC.length||fxC.includes(c))&&(!fxT.length||fxT.includes(t))))return false}
+    return true});
+  const v=s=>{const m=mine[s.no]||{};return so=='lvl'?-(m.lvl||0):so=='bond'?-(m.bond||0):so=='rar'?-s.rar:so=='t'?-(m.t||0):0};
+  if(so=='name')rows.sort((a,b)=>a.name.localeCompare(b.name));else if(so!='no')rows.sort((a,b)=>v(a)-v(b)||a.no-b.no);
+  if(group)rows.sort((a,b)=>ordC(a)-ordC(b));if(!navPick)navL=rows.map(s=>s.no);if(coll)loadArt();
+  let lastC=null;const hd=s=>{if(!group||s.cls===lastC)return '';lastC=s.cls;return `<div class="gh">${s.cls}<span>${rows.filter(x=>x.cls===s.cls).length}</span></div>`};const g=$('#grid');g.className=(view=='rows'?'rows':'')+(dens?' compact':'');
+  g.innerHTML=!rows.length?'<p class="mu" style="padding:16px">Nothing here yet.</p>':view=='grid'?rows.map(s=>hd(s)+card(s,mine[s.no],coll)).join(''):
+    '<div class="r h"><span></span><span>Name</span><span>Class</span><span>Rarity</span><span>Lv</span><span>Skills</span><span>Fou</span><span>Append</span><span>Bond</span></div>'+
+    rows.map(s=>{const m=mine[s.no];return hd(s)+`<div class="r ${m?(m.lvl>=120?'l120':m.lvl>=100?'l100':''):'off'}" data-no="${s.no}"><img loading="lazy" src="${coll&&artC[s.no]?.f||s.face}" alt=""><span>${meta.pins.includes(s.no)?'📌 ':''}${PG()=='database'&&picks.includes(s.no)?'['+(picks.indexOf(s.no)+1)+'] ':''}${s.name}</span><span class="mu">${s.cls}</span><span class="mu">${stars(s)}</span>
+      ${m?`<span>${m.lvl}</span><span>${m.sk.join('/')}</span><span>${m.hp}/${m.atk}</span><span>${m.ap.join('/')}</span><span>♥${m.bond}</span>`:'<span></span>'.repeat(5)}</div>`}).join('');
+  const own=Object.values(mine);$('#stats').textContent=`${own.length} owned of ${list.length} · ${own.filter(P.max).length} fully maxed · showing ${rows.length}${miss?` · ${miss} servants have no filter data yet (press Build filter data)`:''}`;
+  actUi();
+}
+
+// ---------- home ----------
+const ring=(p,z=120,w=10)=>{const r=(z-w)/2,c=2*Math.PI*r,h=z/2;return `<svg width="${z}" height="${z}" viewBox="0 0 ${z} ${z}"><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke="var(--ln)" stroke-width="${w}"/><circle cx="${h}" cy="${h}" r="${r}" fill="none" stroke="var(--ac)" stroke-width="${w}" stroke-linecap="round" stroke-dasharray="${c*p} ${c}" transform="rotate(-90 ${h} ${h})"/></svg>`};
+const bar=(l,n,t,k)=>`<div class="bl"${k?` data-goal="${k}" style="cursor:pointer" title="Show in My Collection"`:''}><span>${l}</span><div><i style="width:${t?n/t*100:0}%"></i></div><span>${n}/${t}</span></div>`;
+const GUIDE=`<div class="pn" style="margin-top:12px"><h3>Guide</h3>
+<details><summary>What does "Fully maxed" mean?</summary><p class="mu">All three skills are level 10 <b>and</b> both Fou stats (HP and ATK) are +2000. Level, NP level, bond, ascension and append skills don't count. Servants that meet it get a gold dot on their card.</p></details>
+<details><summary>What does 10/10/10 mean?</summary><p class="mu">The levels of Skill 1, Skill 2 and Skill 3, in order. 10/9/10 means the second skill is still level 9. Your lists use the same format (for example in "What's left").</p></details>
+<details><summary>Fou 1000 and Fou 2000</summary><p class="mu">Fou upgrades add bonus HP and ATK to a servant. "Fou 1000" means both stats are at least +1000, and "Fou 2000" means both are at +2000 (the maximum).</p></details>
+<details><summary>Bond, NP level and level cap</summary><p class="mu">Bond goes from 0 to 15 (Bond 10 and Bond 15 are goals). NP level is 1 to 5. The level cap is the normal max level for the rarity (5★ 90, 4★ 80, 3★ 70, 2★ 65, 1★ 60). Grailing goes past it, so "Level 100+" and "Level 120" are separate goals.</p></details>
+<details><summary>Card borders and dots</summary><p class="mu">Silver border: level 100 to 119. Gold border with a glow: level 120. Gold dot in the corner: fully maxed. Colored bars under the name show the NP card types (Arts blue, Buster red, Quick green) once filter data is built.</p></details>
+<details><summary>Using filters</summary><p class="mu">In My Collection, click a chip once to show servants that have it done, and a second time to show servants that don't (it gets struck through). A third click turns it off. Several chips combine. The Effects and NP rows need "Build filter data" to be pressed once.</p></details>
+<details><summary>Quick edit on cards</summary><p class="mu">On My Collection cards, the three small buttons are the skill levels and the fourth is bond. Click to add 1, Shift+click to subtract 1. After the maximum it wraps back to the minimum.</p></details>
+<details><summary>Where is my data saved?</summary><p class="mu">In this browser on this device. If you connect Cloud sync (Home page), it is also kept in your private GitHub repository and shared between your devices automatically. Export still gives you a file backup, and Import restores one.</p></details>
+<details><summary>Keyboard shortcuts</summary><p class="mu"><b>/</b> search, <b>G</b> grid or rows, <b>1 2 3</b> switch pages, <b>← →</b> previous or next servant in the popup, <b>Esc</b> close.</p></details></div>`;
+function home(){
+  const own=list.filter(s=>mine[s.no]),n=own.length,pct=list.length?n/list.length:0,m=s=>mine[s.no];
+  const maxed=own.filter(s=>P.max(m(s))).length,c=k=>own.filter(s=>P[k](m(s),s)).length,days=Math.floor((Date.now()-meta.lastExport)/DAY);
+  let h='';
+  if(n&&!fh&&!syOn()&&(!meta.lastExport||days>=7))h+=`<div class="ban"><span>${meta.lastExport?`Last backup ${days} days ago.`:'You have never backed up.'} Your data only lives in this browser.</span><button class="sp" id="hb">Export now</button></div>`;
+  h+=`<div class="hero pn"><div class="rg">${ring(pct,132,12)}<div class="rgt"><b>${Math.round(pct*100)}%</b><span>${n}/${list.length}</span></div></div>
+    <div class="hx"><div class="mu sm">Welcome back, Master</div><h2>${n?`${n} servants in your Chaldea`:'Your Chaldea is empty. Add servants from Database.'}</h2>
+    <div class="stats"><div data-goal="max"><b>${c('max')}</b><span>fully maxed</span></div><div data-goal="bond10"><b>${c('bond10')}</b><span>bond 10</span></div><div data-goal="l100"><b>${c('l100')}</b><span>level 100+</span></div><div data-goal="l120"><b>${c('l120')}</b><span>level 120</span></div></div>
+    <div class="bar"><button id="hs">Copy summary</button><button id="he">Export</button><button id="hi">Import</button><button id="hl">${fh?'File linked ✓':'Link file (auto-save)'}</button></div></div></div>`;
+  h+=`<div class="tiles">${[['Skills 10','sk'],['Fou 2000','fou'],['Bond 15','bond'],['NP 5','np']].map(([l,k])=>{const c=own.filter(s=>P[k](m(s),s)).length;return `<div class="tile pn" data-goal="${k}">${ring(n?c/n:0,56,6)}<div><b>${c}</b><span>${l}</span></div></div>`}).join('')}</div>`;
+  h+=`<div class="pn"><h3>Goals (of owned)</h3><div class="gg">${GOALS.map(([l,k])=>bar(l,c(k),n,k)).join('')}</div></div>`;
+  const cls={},rar={};list.forEach(s=>{cls[s.cls]=cls[s.cls]||[0,0];cls[s.cls][1]++;rar[s.rar]=rar[s.rar]||[0,0];rar[s.rar][1]++;if(m(s)){cls[s.cls][0]++;rar[s.rar][0]++}});
+  const tl=(a,l,att,k)=>`<div class="tl" ${att}="${k}"><span>${l}</span><b>${a[0]}<small>/${a[1]}</small></b><div class="bl2"><i style="width:${a[1]?a[0]/a[1]*100:0}%"></i></div></div>`;
+  h+=`<div class="g2"><div class="pn"><h3>By class</h3><div class="ct">${Object.keys(cls).sort().map(k=>tl(cls[k],k,'data-cls',k)).join('')}</div></div>
+    <div class="pn"><h3>By rarity</h3><div class="ct">${Object.keys(rar).sort((a,b)=>b-a).map(k=>tl(rar[k],'★'.repeat(k)||'0★','data-rar',k)).join('')}</div></div></div>
+    <div class="pn" style="margin-top:12px"><h3>What's left (owned servants)</h3>${leftHtml(own)}</div>`;
+  const mini=a=>a.length?`<div class="mini">${a.map(s=>card(s,m(s),false)).join('')}</div>`:'<span class="mu sm">Nothing yet.</span>';
+  const pins=meta.pins.map(sv).filter(s=>s&&m(s)),rec=[...own].sort((a,b)=>m(b).t-m(a).t).slice(0,8);
+  h+=`<div class="g2"><div class="pn"><h3>📌 Working on</h3>${mini(pins)}</div><div class="pn"><h3>Recently edited</h3>${mini(rec)}</div></div>`;
+  h+=syPanel()+offPanel()+GUIDE;$('#home').innerHTML=h;syUI();storageInfo();if(!navPick)navL=[...new Set([...pins,...rec].map(s=>s.no))];
+}
+
+function summary(){
+  const own=list.filter(s=>mine[s.no]),t=[`FGO account (${region})`,`Owned: ${own.length}/${list.length}`];
+  [5,4,3,2,1,0].forEach(r=>{const a=own.filter(s=>s.rar==r).length;if(a)t.push(`${r}★: ${a}`)});
+  GOALS.forEach(([l,k])=>{const left=todoOf(own,k),done=own.filter(s=>P[k](mine[s.no],s));
+    t.push('',`${l}: ${done.length}/${own.length}`);
+    if(done.length)t.push('  Done: '+done.map(s=>s.name).join(', '));
+    if(left.length)t.push('  Left: '+left.map(s=>{const f=FM[k](mine[s.no],s);return s.name+(f?` (${f})`:'')}).join(', '))});
+  navigator.clipboard.writeText(t.join('\n')).then(()=>toast('Summary copied'),()=>alert(t.join('\n')));
+}
+
+// ---------- popup ----------
+const fld=(l,k,min,max,step,v)=>`<label class="f"><span>${l}</span><input type="number" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${v}"></label>`;
+async function open(no){
+  const s=sv(no);curD=null;$('#modal').classList.add('on');
+  $('#box').innerHTML=`<div class="top"><img src="${s.face}" alt=""><div style="flex:1"><h2>${s.name}</h2><span class="mu">#${no} · ${s.cls} · ${stars(s)}</span></div>
+    ${navPick?`<span class="mu sm">${navL.indexOf(no)+1}/${navL.length}</span>`:''}<button id="pv">‹</button><button id="nx">›</button></div><div id="mine"></div><div id="det" class="sec"><span class="mu">Loading…</span></div>
+    <div class="sec"><button id="close">Close</button></div>`;
+  $('#close').onclick=close;$('#pv').onclick=()=>step(-1);$('#nx').onclick=()=>step(1);drawMine(no);
+  try{if(!cache[region+no])cache[region+no]=await(await fetch(`${API}/nice/${region}/servant/${no}?lore=true&lang=en`)).json();if($('#modal').classList.contains('on'))drawDetail(cache[region+no])}
+  catch{$('#det').innerHTML='<span class="mu">Could not load details.</span>'}
+}
+function step(d){const el=$('#mine');const cur=+el.dataset.no,i=navL.indexOf(cur);if(i<0||navL.length<2)return;open(navL[(i+d+navL.length)%navL.length])}
+function drawMine(no){
+  const own=!!mine[no],m=mine[no],el=$('#mine'),pinned=meta.pins.includes(no);el.dataset.no=no;
+  if(!own){el.innerHTML='<div class="bar addbar"><button id="add" class="a">+ Add to collection</button><span class="mu sm">Add this servant to edit level, skills, Fou and bond.</span></div>';$('#add').onclick=()=>{mine[no]=blank();save();drawMine(no);render();gal();toast('Added')};return}
+  const ml=BASE[sv(no).rar]||40,Q=[];
+  const G=[['Level',[[`Max (${ml})`,x=>x.lvl=ml],['100',x=>x.lvl=100],['120',x=>x.lvl=120],['Lv 1',x=>x.lvl=1]]],
+    ['Skills',[1,2,3,4,5,6,7,8,9,10].map(v=>[String(v),x=>x.sk=[v,v,v]])],
+    ['Bond',[1,2,3,4,5,6,7,8,9,10,15].map(v=>[String(v),x=>x.bond=v])],
+    ['NP',[1,2,3,4,5].map(v=>[String(v),x=>x.np=v])],
+    ['Fou',[['1000/1000',x=>{x.hp=1000;x.atk=1000}],['2000/2000',x=>{x.hp=2000;x.atk=2000}],['HP 2000',x=>x.hp=2000],['ATK 2000',x=>x.atk=2000],['Reset',x=>{x.hp=0;x.atk=0}]]]];
+  const last=Object.entries(mine).filter(([k])=>+k!==no).sort((a,b)=>b[1].t-a[1].t)[0];
+  if(last)G.push(['Copy',[[`Same as ${(sv(last[0])||{}).name||'last'}`,x=>{const y=last[1];Object.assign(x,{lvl:y.lvl,np:y.np,bond:y.bond,hp:y.hp,atk:y.atk,sk:[...y.sk],ap:[...y.ap]})}]]]);
+  let qi=0;const qh=G.map(([l,bs])=>`<div class="qr"><span class="ql">${l}</span>${bs.map(b=>{Q[qi]=b[1];return `<button data-qf="${qi++}">${b[0]}</button>`}).join('')}</div>`).join('');
+  const touch=()=>{if(own){m.t=Date.now();save();render()}};
+  el.innerHTML=`<div class="sec"><b>Progress</b><div class="fs">${fld('Level','lvl',1,120,1,m.lvl)}${fld('NP level','np',1,5,1,m.np)}${fld('Bond','bond',0,15,1,m.bond)}</div></div>
+    <div class="sec"><b>Quick fill</b>${qh}</div>
+    <div class="sec"><b>Skills</b><div class="fs">${m.sk.map((v,i)=>fld('Skill '+(i+1),'sk'+i,1,10,1,v)).join('')}</div></div>
+    <div class="sec"><b>Append skills</b><div class="fs">${m.ap.map((v,i)=>fld('Append '+(i+1),'ap'+i,0,10,1,v)).join('')}</div></div>
+    <div class="sec"><b>Fou</b><div class="fs">${fld('HP +','hp',0,2000,10,m.hp)}${fld('ATK +','atk',0,2000,10,m.atk)}</div></div>
+    <div class="sec"><b>Notes</b><textarea id="note" placeholder="Plans, team use…">${m.note.replace(/</g,'&lt;')}</textarea>
+    <div class="bar" style="margin-top:8px">${own?`<button id="max">Max everything</button><button id="pn">${pinned?'Unpin':'📌 Pin'}</button><button id="rm">Remove</button>`:''}</div></div>`;
+  el.querySelectorAll('[data-qf]').forEach(b=>b.onclick=()=>{Q[+b.dataset.qf](m);touch();drawMine(no)});
+  el.querySelectorAll('input[data-k]').forEach(i=>i.oninput=()=>{const v=Math.min(+i.max,Math.max(+i.min,+i.value||+i.min)),k=i.dataset.k;
+    if(k.startsWith('sk'))m.sk[+k[2]]=v;else if(k.startsWith('ap'))m.ap[+k[2]]=v;else m[k]=v;touch()});
+  $('#note').oninput=e=>{m.note=e.target.value;if(own){m.t=Date.now();save()}};
+  if(own){
+    $('#max').onclick=()=>{m.sk=[10,10,10];m.ap=[10,10,10,10,10];m.hp=m.atk=2000;touch();drawMine(no)};
+    $('#pn').onclick=()=>{meta.pins=pinned?meta.pins.filter(x=>x!=no):[...meta.pins,no];save();drawMine(no);render()};
+    $('#rm').onclick=()=>{if(confirm('Remove from collection?')){delete mine[no];meta.del[no]=Date.now();meta.pins=meta.pins.filter(x=>x!=no);save();drawMine(no);render();gal()}};
+  }
+}
+const CC={'1':'#4a8ff0','2':'#e05a4f','3':'#4fbf6a'},CNM={'1':'Arts','2':'Buster','3':'Quick'};
+let curD=null;
+function gal(){
+  const el=$('#gal');if(!el||!curD)return;
+  const no=+$('#mine').dataset.no,own=!!mine[no],g=curD.extraAssets?.charaGraph||{},asc=g.ascension||{},cs=g.costume||{},cp=curD.profile?.costume||{},have=((meta.costumes||{})[no]||[]).map(String);
+  const th=(u,l,lock,x)=>`<div class="th ${lock?'lk':''}">${lock?'<i class="lock">🔒</i><img src="'+u+'" alt="">':'<a href="'+u+'" target="_blank"><img loading="lazy" src="'+u+'" alt=""></a>'}<small>${l}</small>${x||''}</div>`;
+  const ch=Object.keys(cs).map(id=>{const on=own&&have.includes(id);return th(cs[id],(cp[id]?.shortName||cp[id]?.name||'Costume'),!on,`<label class="sm"><input type="checkbox" data-cos="${id}" ${on?'checked':''} ${own?'':'disabled'}> I have it</label>`)}).join('');
+  el.innerHTML=`<b class="mu sm">ASCENSION ART</b><div class="gal">${Object.keys(asc).map(k=>th(asc[k],'Stage '+k,!own)).join('')}</div>`+(ch?`<div class="sec"><b class="mu sm">COSTUMES</b><div class="gal">${ch}</div></div>`:'')+(own?'':'<div class="mu sm" style="margin-top:8px">Add this servant to your collection to unlock the art.</div>');
+}
+function drawDetail(d){
+  curD=d;
+  const pick=(a,g)=>{const o={};(a||[]).forEach(x=>{const k=g(x);if(!o[k.num]||k.pr>o[k.num].pr)o[k.num]=k});return Object.values(o).sort((a,b)=>a.num-b.num)};
+  const sk=pick(d.skills,k=>({num:k.num,pr:k.priority,n:k.name,i:k.icon,d:k.detail})),ap=pick(d.appendPassive,a=>({num:a.num,pr:a.priority,n:a.skill?.name,i:a.skill?.icon,d:a.skill?.detail}));
+  const row=(k,p)=>`<div class="sk"><img src="${k.i}" alt=""><div><b>${p}${k.n}</b><small>${clean(k.d)}</small></div></div>`;
+  const o={};(d.noblePhantasms||[]).filter(n=>(n.functions||[]).length).forEach(n=>o[n.name+n.card]=n);
+  const npH=n=>{const dm=(n.functions||[]).find(f=>f.funcType.startsWith('damageNp')),tg=dm?(dm.funcTargetType=='enemyAll'?'AoE':'Single target'):'Support',c=CC[n.card]||'#888';
+    return `<div class="sk" style="border-left:3px solid ${c};padding-left:10px"><div><b>${n.name} <small style="color:${c}">${CNM[n.card]||''} · ${tg}</small></b><small>${clean(n.detail)}</small></div></div>`};
+  $('#det').innerHTML=`<b class="mu sm">SKILLS</b>${sk.map(k=>row(k,k.num+'. ')).join('')}
+    <div class="sec"><b class="mu sm">NOBLE PHANTASM</b>${Object.values(o).map(npH).join('')}</div>
+    ${ap.length?`<div class="sec"><b class="mu sm">APPEND SKILLS</b>${ap.map((k,i)=>row(k,(i+1)+'. ')).join('')}</div>`:''}
+    <div class="sec" id="gal"></div>`;
+  gal();
+}
+const close=()=>{navPick=false;$('#modal').classList.remove('on')};
+
+// ---------- events ----------
+document.addEventListener('click',e=>{
+  const q=e.target.closest('[data-q]');
+  if(q){e.stopPropagation();const m=mine[q.dataset.no],k=q.dataset.q,[lo,hi]=k=='bond'?[0,15]:[1,10],cur=k=='bond'?m.bond:m.sk[+k[2]];
+    let v=cur+(e.shiftKey?-1:1);if(v>hi)v=lo;if(v<lo)v=hi;k=='bond'?m.bond=v:m.sk[+k[2]]=v;m.t=Date.now();save();render();return}
+  const rm=e.target.closest('[data-rm]');if(rm){const k=rm.dataset.rm;if(k=='all'){['#q','#cls','#rar','#own','#lvm'].forEach(i=>$(i).value='');fs={};fe={}}else if(['q','cls','rar','own','lvm'].includes(k))$('#'+k).value='';else if(k[0]=='f')delete fs[k.slice(2)];else delete fe[k.slice(2)];paint();render();return}
+  const c=e.target.closest('[data-no]');if(c&&c.closest('#grid,#home')){const n=+c.dataset.no;if(pickMode&&PG()=='database'&&c.closest('#grid')){picks=picks.includes(n)?picks.filter(x=>x!==n):[...picks,n];savePicks();return}navPick=false;return open(n)}
+  const t=e.target.closest('[data-todo]');if(t)goColl({fs:{[t.dataset.todo]:2}})
+  const cl=e.target.closest('[data-cls],[data-rar]');if(cl)goColl({cls:cl.dataset.cls||'',rar:cl.dataset.rar||''})
+  const gl=e.target.closest('[data-goal]');if(gl)goColl({fs:{[gl.dataset.goal]:1}})
+  if(e.target.id=='modal')close();
+});
+$('#chips').onclick=e=>{const b=e.target.closest('[data-f]');if(!b)return;const k=b.dataset.f;fs[k]=((fs[k]||0)+1)%3;paint();render()};
+['q','cls','rar','own','sort','lvm'].forEach(id=>$('#'+id).oninput=render);
+$('#pre').onchange=e=>{const v=e.target.value;if(!v)return;const p=v[0]=='b'?BI[+v.slice(1)][1]:meta.presets[+v.slice(1)].s;applyState(p);render();e.target.value=''};
+$('#ps').onclick=()=>{const n=prompt('Preset name?');if(!n)return;meta.presets.push({n,s:getState()});save();presets();toast('Preset saved')};
+$('#pd').onclick=()=>{if(!meta.presets.length)return toast('No saved presets');const n=prompt('Delete which preset?\n'+meta.presets.map(p=>p.n).join(', '));meta.presets=meta.presets.filter(p=>p.n!==n);save();presets()};
+$('#vg').onclick=()=>{view='grid';LS.set('fgo_view',view);route()};$('#vr').onclick=()=>{view='rows';LS.set('fgo_view',view);route()};
+$('#sy').onclick=()=>{if(PG()!='home')location.hash='home';setTimeout(()=>{const e=$('#syp');if(e)e.scrollIntoView({behavior:'smooth',block:'center'})},80)};
+$('#th').onclick=()=>{theme=theme=='dark'?'light':'dark';document.documentElement.dataset.theme=theme;LS.set('fgo_theme',theme)};
+$('#reg').onchange=e=>{region=e.target.value;LS.set('fgo_region',region);load()};
+$('#home').addEventListener('click',e=>{const i=e.target.id;if(i=='hb'||i=='he')exportJ();if(i=='hi')importJ();if(i=='hs')summary();if(i=='hl')linkFile();if(i=='sc')syConnect();if(i=='sn')syncNow();if(i=='sx')syOff()});
+document.onkeydown=e=>{
+  if(e.key=='Escape')return close();
+  if(/INPUT|TEXTAREA|SELECT/.test(e.target.tagName))return;
+  if($('#modal').classList.contains('on')){if(e.key=='ArrowLeft')step(-1);if(e.key=='ArrowRight')step(1);return}
+  if(e.key=='/'){e.preventDefault();if(PG()=='home')location.hash='collection';setTimeout(()=>$('#q').focus(),0)}
+  if(e.key=='g'&&PG()!='home'){view=view=='grid'?'rows':'grid';LS.set('fgo_view',view);route()}
+  if(e.key=='1')location.hash='home';if(e.key=='2')location.hash='collection';if(e.key=='3')location.hash='database';
+};
+const EFF=[{k:'guts',l:'Guts',t:['guts']},{k:'pierce',l:'Pierce / Ignore Invincible',t:['pierceInvincible'],n:['ignore invincible','pierce invincib']},{k:'invinc',l:'Invincible',t:['invincible']},{k:'evade',l:'Evade',t:['avoidance']},{k:'dimm',l:'Debuff Immune',t:['avoidState']},{k:'npseal',l:'NP Seal',t:['donotNoble']},{k:'npgain',l:'NP Gain Up',t:['upDropnp']},{k:'star',l:'Star Gather Up',t:['upStarweight']},{k:'taunt',l:'Taunt',t:['upHate'],n:['target focus','taunt']},{k:'stun',l:'Stun',t:['donotAct'],n:['stun']},{k:'bup',l:'Buster Up',n:['buster up']},{k:'aup',l:'Arts Up',n:['arts up']},{k:'qup',l:'Quick Up',n:['quick up']},{k:'npc',l:'NP Charge',fn:['gainNp']}];
+let fe={},idx={},building=false;
+const ex=d=>{const b=new Set(),n=new Set(),f=new Set(),np=[];
+  const scan=fl=>(fl||[]).forEach(x=>{f.add(x.funcType);(x.buffs||[]).forEach(y=>{b.add(y.type);if(y.name)n.add(y.name.toLowerCase())})});
+  (d.skills||[]).forEach(s=>scan(s.functions));
+  (d.noblePhantasms||[]).forEach(p=>{if(!(p.functions||[]).length)return;scan(p.functions);const dm=p.functions.find(x=>x.funcType.startsWith('damageNp'));np.push([String(p.card),dm?(dm.funcTargetType=='enemyAll'?'aoe':'st'):'sup'])});
+  return {b:[...b],n:[...n],f:[...f],np}};
+const has=(ix,k)=>{const x=EFF.find(e=>e.k==k);return !!x&&((x.t&&x.t.some(t=>ix.b.includes(t)))||(x.n&&x.n.some(m=>ix.n.some(v=>v.includes(m))))||(x.fn&&x.fn.some(t=>ix.f.includes(t))))};
+const bp=()=>{const n=Object.keys(idx).length;if(!$('#bp'))return;$('#bp').textContent=building?`Building ${n}/${list.length}…`:n>=list.length?`Filter data ready (${n})`:`${n}/${list.length} indexed`;$('#bi').textContent=building?'Stop':n>=list.length?'Rebuild':'Build filter data'};
+async function buildIdx(){
+  if(building){building=false;return}
+  if(Object.keys(idx).length>=list.length)idx={};
+  building=true;const key='fgo_idx_'+region,todo=[...list].sort((a,b)=>!!mine[b.no]-!!mine[a.no]).filter(s=>!idx[s.no]);let i=0,done=0;
+  const w=async()=>{while(i<todo.length&&building){const s=todo[i++];try{const d=await(await fetch(`${API}/nice/${region}/servant/${s.no}?lore=false&lang=en`)).json();idx[s.no]=ex(d);artC[s.no]=artOf(d)}catch{}if(++done%10==0){LS.set(key,idx);LS.set('fgo_art_'+region,artC);bp()}}};
+  bp();await Promise.all([1,2,3,4,5].map(w));building=false;LS.set(key,idx);LS.set('fgo_art_'+region,artC);bp();render();toast('Filter data saved');
+}
+$('#fx').innerHTML='<span class="mu sm">Effects:</span>'+EFF.map(x=>`<button class="chip" data-x="e:${x.k}">${x.l}</button>`).join('')+'<span class="mu sm">NP:</span>'+[['c:1','Arts'],['c:2','Buster'],['c:3','Quick'],['t:st','Single target'],['t:aoe','AoE'],['t:sup','Support']].map(([k,l])=>`<button class="chip" data-x="${k}">${l}</button>`).join('')+'<span class="sp"></span><span id="bp" class="mu sm"></span><button id="bi">Build filter data</button>';
+$('#fx').onclick=e=>{const b=e.target.closest('[data-x]');if(b){const k=b.dataset.x;fe[k]?delete fe[k]:fe[k]=1;paint();render()}if(e.target.id=='bi')buildIdx()};
+$('#box').addEventListener('change',e=>{const id=e.target.dataset.cos;if(!id)return;const no=+$('#mine').dataset.no;meta.costumes=meta.costumes||{};let a=(meta.costumes[no]||[]).map(String);a=e.target.checked?[...a,id]:a.filter(x=>x!==id);meta.costumes[no]=a.map(Number);save();gal()});
+const dots=no=>{const x=idx[no];return x?'<div class="dots">'+[...new Set(x.np.map(p=>p[0]))].map(c=>`<i class="dot" style="background:${CC[c]||'#888'}"></i>`).join('')+'</div>':''};
+document.addEventListener('click',e=>{if(e.target.id=='retry'){try{localStorage.removeItem('fgo_list2_'+region)}catch{}load()}});
+let artC={},artBusy=false,picks=LS.get('fgo_picks',[]),pickMode=false,navPick=false;
+const artOf=d=>{const g=d.extraAssets?.charaGraph?.ascension||{},f=d.extraAssets?.faces?.ascension||{},k=o=>{const ks=Object.keys(o).map(Number).sort((a,b)=>b-a);return ks.length?o[ks[0]]:null};return {a:k(g),f:k(f)}};
+async function loadArt(){
+  const need=list.filter(s=>mine[s.no]&&!artC[s.no]);if(artBusy||!need.length)return;
+  artBusy=true;let i=0,n=0;const key='fgo_art_'+region;
+  const w=async()=>{while(i<need.length){const s=need[i++];try{artC[s.no]=artOf(await(await fetch(`${API}/nice/${region}/servant/${s.no}?lore=false&lang=en`)).json())}catch{}if(++n%6==0){LS.set(key,artC);if(PG()=='collection')render()}}};
+  await Promise.all([1,2,3].map(w));LS.set(key,artC);artBusy=false;if(PG()=='collection')render();
+}
+const findName=t=>{const w=t.toLowerCase().split(/\s+/).filter(Boolean);if(!w.length)return null;return list.filter(s=>{const n=s.name.toLowerCase();return w.every(x=>n.includes(x))}).sort((a,b)=>a.name.length-b.name.length)[0]||null};
+function pkui(){$('#pm').textContent='Pick mode: '+(pickMode?'on':'off');$('#pm').classList.toggle('a',pickMode);$('#po').textContent=`List (${picks.length})`;
+  $('#pl').innerHTML=picks.map((n,i)=>`<span class="nm" data-pr="${n}" title="Remove">${i+1}. ${(sv(n)||{}).name||n} ✕</span>`).join('')||'<span class="mu sm">Empty. Turn on Pick mode and click cards, or type names above.</span>'}
+const savePicks=()=>{LS.set('fgo_picks',picks);pkui();if(PG()=='database')render()};
+$('#pm').onclick=()=>{pickMode=!pickMode;pkui()};
+$('#po').onclick=()=>{$('#pp').hidden=!$('#pp').hidden};
+$('#ps2').onclick=()=>{if(!picks.length)return toast('Pick list is empty');navPick=true;navL=[...picks];open(picks[0])};
+$('#pa').onclick=()=>{const bad=[];$('#pt').value.split(/[\n,]+/).map(x=>x.trim()).filter(Boolean).forEach(t=>{const s=findName(t);if(!s)bad.push(t);else if(!picks.includes(s.no))picks.push(s.no)});$('#pt').value=bad.join('\n');savePicks();toast(bad.length?'Not found: '+bad.join(', '):'Added')};
+$('#psn').onclick=()=>{picks.sort((a,b)=>a-b);savePicks()};
+$('#pc').onclick=()=>{picks=[];savePicks()};
+$('#pl').onclick=e=>{const c=e.target.closest('[data-pr]');if(c){picks=picks.filter(x=>x!=+c.dataset.pr);savePicks()}};
+let ui=LS.get('fgo_ui',{}),dens=!!ui.dens,group=!!ui.group,qedit=!!ui.qedit,more=!!ui.more,offBusy=false,offMsg='';
+const uiSave=()=>LS.set('fgo_ui',{dens,group,qedit,more});
+function uiPaint(){$('#qe').classList.toggle('a',qedit);$('#dn').classList.toggle('a',dens);$('#gp').classList.toggle('a',group);$('#more').hidden=!more}
+$('#qe').onclick=()=>{qedit=!qedit;uiSave();uiPaint();render()};
+$('#dn').onclick=()=>{dens=!dens;uiSave();uiPaint();render()};
+$('#gp').onclick=()=>{group=!group;uiSave();uiPaint();render()};
+$('#mf').onclick=()=>{more=!more;uiSave();uiPaint();actUi()};
+const ORD=['Saber','Archer','Lancer','Rider','Caster','Assassin','Berserker','Ruler','Avenger','Moon Cancer','Alter Ego','Foreigner','Pretender','Shielder','Beast'];
+const ordC=s=>{const i=ORD.findIndex(x=>s.cls.startsWith(x));return i<0?99:i};
+const FL={max:'Fully maxed',lv:'Level cap',l100:'Lv 100+',l120:'Lv 120',sk:'Skills 10',fou1:'Fou 1000',fou:'Fou 2000',np:'NP 5',bond10:'Bond 10',bond:'Bond 15'};
+function actUi(){
+  const coll=PG()=='collection',a=[];if(!list.length)return;
+  if($('#q').value)a.push(['q','“'+$('#q').value+'”']);if($('#cls').value)a.push(['cls',$('#cls').value]);if($('#rar').value!=='')a.push(['rar',$('#rar').value+'★']);
+  if(!coll&&$('#own').value)a.push(['own',$('#own').value=='y'?'Owned':'Not owned']);
+  let n=0;if(coll&&$('#lvm').value){a.push(['lvm','Lv ≥ '+$('#lvm').value]);n++}
+  if(coll)for(const k in fs)if(fs[k]){a.push(['f:'+k,(fs[k]==2?'Not: ':'')+(FL[k]||k)]);n++}
+  for(const k in fe){const t=k.slice(2);a.push(['x:'+k,k[0]=='e'?(EFF.find(x=>x.k==t)||{}).l||t:{1:'Arts',2:'Buster',3:'Quick',st:'Single target',aoe:'AoE',sup:'Support'}[t]||t]);n++}
+  $('#act').innerHTML=a.length?a.map(([k,l])=>`<span class="nm" data-rm="${k}">${l} ✕</span>`).join('')+'<span class="nm" data-rm="all">Clear all</span>':'';
+  $('#mf').textContent='Filters '+(more?'▴':'▾')+(n?` (${n})`:'');
+}
+const offPanel=()=>`<div class="pn" style="margin-top:12px"><h3>Offline mode</h3><p class="mu sm">Save images and data so the app works without internet. Needs the hosted or localhost version.</p>
+<div class="bar"><button id="o1">Level 1: all face icons</button><button id="o2">Level 2: + details and art for my servants</button><button id="op">Keep my data</button><button id="oc">Clear</button></div>
+<div class="mu sm" id="offs" style="margin-top:8px">${offMsg}</div><div class="mu sm" id="offu"></div></div>`;
+const setOff=t=>{offMsg=t;const e=$('#offs');if(e)e.textContent=t};
+const storageInfo=()=>{if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(e=>{const el=$('#offu');if(el)el.textContent=`Browser storage in use: ${(e.usage/1048576).toFixed(0)} MB of about ${(e.quota/1048576).toFixed(0)} MB`})};
+async function fetchAll(urls,label){
+  const c=await caches.open('fgo-off');let i=0,done=0,ok=0,fail=0;
+  const w=async()=>{while(i<urls.length){const u=urls[i++];try{if(!(await c.match(u))){const r=await fetch(u,{mode:'cors'});if(!r.ok)throw 0;await c.put(u,r)}ok++}catch{fail++}
+    done++;if(done%10==0||done==urls.length)setOff(`${label}: ${done}/${urls.length}${fail?` (${fail} failed)`:''}`);
+    if(fail>=10&&!ok){i=urls.length;throw new Error('the image server did not allow saving images offline')}}};
+  await Promise.all([1,2,3,4].map(w));
+}
+async function offline(level){
+  if(!('caches' in window)||!navigator.serviceWorker||!location.protocol.startsWith('http'))return setOff('Offline mode needs the hosted or localhost version, not a double-clicked file.');
+  if(offBusy||!list.length)return;offBusy=true;
+  try{
+    await fetchAll([...new Set(list.map(s=>s.face))],'Face icons');
+    if(level>=2){
+      const own=list.filter(s=>mine[s.no]),api=await caches.open('fgo-api-v1'),urls=[];let i=0;
+      for(const s of own){setOff(`Servant details: ${++i}/${own.length}`);const u=`${API}/nice/${region}/servant/${s.no}?lore=true&lang=en`;
+        try{let r=await api.match(u);if(!r){r=await fetch(u);if(!r.ok)throw 0;await api.put(u,r.clone())}const d=await r.json(),e=d.extraAssets||{};
+          urls.push(...Object.values(e.charaGraph?.ascension||{}),...Object.values(e.faces?.ascension||{}),...(d.skills||[]).map(k=>k.icon),...(d.classPassive||[]).map(k=>k.icon),...(d.appendPassive||[]).map(a=>a.skill?.icon))}catch{}}
+      await fetchAll([...new Set(urls.filter(Boolean))],'Servant art');
+    }
+    setOff('Done. Offline data saved.');
+  }catch(e){setOff('Stopped: '+(e.message||e))}
+  offBusy=false;storageInfo();
+}
+$('#home').addEventListener('click',e=>{const i=e.target.id;
+  if(i=='o1')offline(1);if(i=='o2')offline(2);
+  if(i=='op'&&navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(ok=>toast(ok?'The browser will keep your offline data':'The browser declined; data may be cleared when space is low'));
+  if(i=='oc'&&'caches' in window)Promise.all([caches.delete('fgo-off'),caches.delete('fgo-api-v1')]).then(()=>{toast('Offline data cleared');setOff('');storageInfo()})});
+window.onhashchange=route;
+document.documentElement.dataset.theme=theme;load();
+if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>
